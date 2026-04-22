@@ -137,9 +137,9 @@ const HistoryPage = () => {
                     </td>
 
                     {/* CLIENTE */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white/40 uppercase">
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-6 text-center">
+                      <div className="flex items-center justify-center text-center">
+                        <span className="text-[10px] font-bold text-white/40 uppercase max-w-[200px] leading-relaxed">
                           {r.customer_name}
                         </span>
                       </div>
@@ -147,7 +147,7 @@ const HistoryPage = () => {
 
                     {/* QUANTIDADE */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex flex-col items-center justify-center">
+                      <div className="flex flex-col items-center justify-center text-center">
                         <span className="text-[14px] font-black text-white leading-none">
                           {r.quantity || 1} <span className="text-[8px] text-white/30 tracking-widest font-bold">UN</span>
                         </span>
@@ -159,8 +159,8 @@ const HistoryPage = () => {
 
                     {/* RESPONSÁVEL */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                      <div className="flex items-center justify-center gap-2 text-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
                         <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
                           {r.processed_by || 'SISTEMA'}
                         </span>
