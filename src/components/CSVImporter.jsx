@@ -43,20 +43,16 @@ const CSVImporter = ({ onDataProcessed }) => {
     const customers = {};
 
     data.forEach((row) => {
-      // 1. Filtro de Cancelados
-      const isCancelled = row['CANCELADO']?.toLowerCase().trim() === 'sim';
-      if (isCancelled) return;
+      // 1. Filtro de Tipo (Venda ou Devolução)
+      const type = row['TIPO']?.toLowerCase().trim();
+      const isRelevant = type === 'venda' || type === 'devolucao';
+      if (!isRelevant) return;
 
-      // 2. Filtro de Tipo (Venda)
-      const isSale = row['TIPO']?.toLowerCase().trim() === 'venda';
-      if (!isSale) return;
-
-      // 3. Filtro de Cliente Genérico
+      // 2. Filtro de Cliente Genérico
       const customerName = row['CLIENTE']?.trim();
       if (!customerName || customerName.toUpperCase().includes('CONSUMIDOR')) return;
 
-      // 4. Filtro de Data (Últimos 30 dias)
-      // O formato vindo é "DD/MM/YYYY HH:mm:ss" - pegamos apenas a data
+      // 3. Filtro de Data (Últimos 30 dias)
       try {
         const datePart = row['DATA'].split(' ')[0];
         const orderDate = parse(datePart, 'dd/MM/yyyy', new Date());
@@ -65,16 +61,21 @@ const CSVImporter = ({ onDataProcessed }) => {
         return;
       }
 
-      // 5. Cálculo de Pontos (Total - Frete)
+      // 4. Cálculo de Pontos (Total - Frete)
       // Substitui vírgula por ponto para o JavaScript entender o número
-      const totalStr = String(row['TOTAL'] || '0').replace(',', '.');
-      const freightStr = String(row['R$ FRETE'] || '0').replace(',', '.');
+      const totalStr = String(row['TOTAL'] || '0').trim().replace(',', '.');
+      const freightStr = String(row['R$ FRETE'] || '0').trim().replace(',', '.');
       
-      const total = parseFloat(totalStr);
-      const freight = parseFloat(freightStr);
-      const pointsGenerated = Math.floor(total - freight);
+      const total = parseFloat(totalStr) || 0;
+      const freight = parseFloat(freightStr) || 0;
+      let pointsGenerated = Math.floor(total - freight);
 
-      if (pointsGenerated <= 0) return;
+      // Se for devolução, o valor deve subtrair (ser negativo)
+      if (type === 'devolucao') {
+        pointsGenerated = -Math.abs(pointsGenerated);
+      }
+
+      if (pointsGenerated === 0) return;
 
       if (!customers[customerName]) {
         customers[customerName] = { 

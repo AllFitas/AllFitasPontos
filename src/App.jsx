@@ -7,6 +7,7 @@ import { useSupabaseSync } from './hooks/useSupabaseSync';
 import CustomersPage from './pages/CustomersPage';
 import StorePage from './pages/StorePage';
 import LoginPage from './pages/LoginPage';
+import HistoryPage from './pages/HistoryPage';
 import { Toaster, toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -17,7 +18,13 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ customers: 0, points: 0, redemptions: 0 });
   const [chartData, setChartData] = useState([]);
   const [expiringSoon, setExpiringSoon] = useState([]);
+  const [now, setNow] = useState(new Date());
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -61,20 +68,22 @@ const Dashboard = () => {
           const diffTime = expiryDate - today;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           
-          if (o.points_remaining > 0 && diffDays >= 0 && diffDays <= 3) {
+          if (o.points_remaining > 0 && expiryDate > new Date() && diffDays <= 3) {
             if (!expiringMap[o.customer_name]) {
               expiringMap[o.customer_name] = { 
                 name: o.customer_name, 
                 points: 0, 
-                daysLeft: diffDays 
+                expiryDate: expiryDate 
               };
             }
             expiringMap[o.customer_name].points += o.points_remaining;
-            expiringMap[o.customer_name].daysLeft = Math.min(expiringMap[o.customer_name].daysLeft, diffDays);
+            if (expiryDate < expiringMap[o.customer_name].expiryDate) {
+              expiringMap[o.customer_name].expiryDate = expiryDate;
+            }
           }
         });
         
-        setExpiringSoon(Object.values(expiringMap).sort((a,b) => a.daysLeft - b.daysLeft));
+        setExpiringSoon(Object.values(expiringMap).sort((a,b) => a.expiryDate - b.expiryDate));
 
         // Buscar contagem de resgates para o card de estatística
         const { count } = await supabase
@@ -97,6 +106,18 @@ const Dashboard = () => {
 
   const COLORS = ['#00d2ff', '#3a7bd5', '#9d50bb'];
 
+  const formatCountdown = (targetDate) => {
+    const diff = targetDate - now;
+    if (diff <= 0) return "EXPIRADO";
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    return `${days}d:${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
+  };
+
   if (loading) return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {[1,2,3].map(i => <div key={i} className="glass-card h-24 skeleton" />)}
@@ -111,14 +132,11 @@ const Dashboard = () => {
             <div className="w-1.5 h-6 sm:w-2 sm:h-8 bg-primary rounded-full shadow-[0_0_20px_var(--primary-glow)]" />
             <h2 className="text-3xl sm:text-5xl font-black tracking-[-0.05em] text-white">Análise Geral</h2>
           </div>
-          <p className="text-[10px] sm:text-xs text-text-muted font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] opacity-80 flex items-center gap-2">
-            <div className="w-1 h-1 rounded-full bg-primary" />
-            Fidelidade & Performance
-          </p>
+
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {[
           { label: 'Clientes Ativos', value: stats.customers, delay: 0 },
           { label: 'Saldo em Pontos', value: stats.points.toLocaleString(), delay: 0.1 },
@@ -127,7 +145,7 @@ const Dashboard = () => {
           <motion.div 
             key={idx}
             initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: item.delay, duration: 0.8 }}
-            className="glass px-4 py-3 sm:px-6 sm:py-4 border border-white/5 flex items-center gap-2 group hover:bg-white/[0.03] transition-colors"
+            className="glass px-4 py-3 sm:px-6 sm:py-5 border border-white/5 flex items-center gap-4 group hover:bg-white/[0.03] transition-colors"
           >
             <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/40">{item.label}:</span>
             <span className="text-lg sm:text-xl font-black text-white">{item.value}</span>
@@ -141,9 +159,9 @@ const Dashboard = () => {
           <div style={{ padding: '20px 24px', background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AlertTriangle size={18} className="text-error animate-pulse" />
-              <h3 style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Atenção: Pontos a Expirar</h3>
+              <h3 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Atenção: Pontos a Expirar</h3>
             </div>
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '4px 10px', fontSize: '9px', fontWeight: 900, color: 'var(--error)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '6px 12px', fontSize: '11px', fontWeight: 900, color: 'var(--error)', textTransform: 'uppercase', letterSpacing: '1px' }}>
               {expiringSoon.length} EM RISCO
             </div>
           </div>
@@ -159,28 +177,25 @@ const Dashboard = () => {
                 className="dashboard-alert-item hover:bg-white/[0.05] group"
               >
                 <div className="alert-icon" style={{ color: item.daysLeft === 0 ? 'var(--error)' : 'rgba(255, 255, 255, 0.2)' }}>
-                  <Clock size={18} />
+                  <Clock size={20} />
                 </div>
                 
                 <div className="alert-name">
-                  <p style={{ fontSize: '12px', fontWeight: 800, color: 'rgba(255, 255, 255, 0.9)', textTransform: 'uppercase', margin: 0 }}>{item.name}</p>
+                  <p>{item.name}</p>
                 </div>
-
-                <div className="alert-status" style={{ textAlign: 'center' }}>
-                  <span style={{ 
-                    fontSize: '8px', 
-                    fontWeight: 900, 
-                    padding: '3px 6px', 
-                    background: item.daysLeft === 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    color: item.daysLeft === 0 ? 'var(--error)' : 'var(--text-muted)',
-                    border: item.daysLeft === 0 ? '1px solid rgba(239, 68, 68, 0.2)' : '1px solid transparent'
+                
+                <div className="alert-status">
+                  <span className="alert-status-badge" style={{ 
+                    background: (item.expiryDate - now) < (1000 * 60 * 60 * 24) ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    color: (item.expiryDate - now) < (1000 * 60 * 60 * 24) ? 'var(--error)' : 'var(--text-muted)',
+                    border: (item.expiryDate - now) < (1000 * 60 * 60 * 24) ? '1px solid rgba(239, 68, 68, 0.2)' : '1px solid transparent'
                   }}>
-                    {item.daysLeft === 0 ? 'EXPIRA HOJE' : `EM ${item.daysLeft} DIA${item.daysLeft > 1 ? 'S' : ''}`}
+                    {formatCountdown(item.expiryDate)}
                   </span>
                 </div>
 
-                <div className="alert-points" style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#fff', margin: 0 }}>{item.points.toLocaleString()}</p>
+                <div className="alert-points">
+                  <p>{item.points.toLocaleString()}</p>
                 </div>
               </motion.div>
             ))}
@@ -324,6 +339,7 @@ const App = () => {
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/clientes" element={<CustomersPage />} />
             <Route path="/loja" element={<StorePage />} />
+            <Route path="/historico" element={<HistoryPage />} />
           </Routes>
         </AnimatePresence>
       </Layout>

@@ -55,8 +55,7 @@ export const useSupabaseSync = () => {
         .from('orders')
         .select('points_remaining')
         .eq('customer_name', customerName)
-        .gte('order_date', isoThreshold)
-        .gt('points_remaining', 0);
+        .gte('order_date', isoThreshold);
 
       if (ordersError) throw ordersError;
 
@@ -68,7 +67,7 @@ export const useSupabaseSync = () => {
     }
   };
 
-  const redeemPointsFIFO = async (customerName, productId, pointsToRedeem) => {
+  const redeemPointsFIFO = async (customerName, productId, pointsToRedeem, quantity = 1) => {
     setLoading(true);
     setError(null);
     try {
@@ -76,7 +75,8 @@ export const useSupabaseSync = () => {
       const { error: rpcError } = await supabase.rpc('redeem_points_fifo', {
         p_customer_name: customerName,
         p_product_id: productId,
-        p_points_to_redeem: pointsToRedeem
+        p_points_to_redeem: pointsToRedeem,
+        p_quantity: quantity
       });
 
       if (rpcError) throw rpcError;

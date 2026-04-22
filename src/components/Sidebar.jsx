@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Upload, Users, ShoppingBag, Settings, Award, LogOut } from 'lucide-react';
+import { LayoutDashboard, Upload, Users, ShoppingBag, History, Settings, Award, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
@@ -14,6 +14,7 @@ const Sidebar = () => {
     { path: '/upload', icon: Upload, label: 'Importar' },
     { path: '/clientes', icon: Users, label: 'Clientes' },
     { path: '/loja', icon: ShoppingBag, label: 'Loja' },
+    { path: '/historico', icon: History, label: 'Histórico' },
   ];
 
   return (

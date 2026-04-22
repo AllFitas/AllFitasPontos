@@ -291,3 +291,75 @@ input:focus, select:focus, textarea:focus {
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+/* Dashboard Redesign - Alert Items */
+.dashboard-alert-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: var(--transition);
+}
+
+.dashboard-alert-item:last-child {
+  border-bottom: none;
+}
+
+.alert-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  max-width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  color: var(--text-muted);
+}
+
+.alert-name {
+  flex: 2;
+  min-width: 0;
+}
+
+.alert-name p {
+  font-family: var(--font-heading);
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-status {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 130px;
+}
+
+.alert-status-badge {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  padding: 6px 14px !important;
+  border-radius: 8px;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.alert-points {
+  flex: 1;
+  text-align: right;
+  min-width: 100px;
+}
+
+.alert-points p {
+  font-family: var(--font-heading);
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+}
+

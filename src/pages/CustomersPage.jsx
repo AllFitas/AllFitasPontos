@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import { Search, User, Award, ArrowRight, X, Clock, ShoppingBag, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const HistoryModal = ({ customer, onClose }) => {
   const [history, setHistory] = useState({ orders: [], redemptions: [] });
   const [loading, setLoading] = useState(true);
-  const [metrics, setMetrics] = useState({ total: 0, used: 0, expired: 0, available: 0 });
+  const [metrics, setMetrics] = useState({ total: 0, used: 0, returned: 0, expired: 0, available: 0 });
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -29,33 +30,33 @@ const HistoryModal = ({ customer, onClose }) => {
       const allRedemptions = red || [];
 
       // 2. Calculations
+      const now = new Date();
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const totalAccumulated = allOrders.reduce((acc, o) => acc + o.points, 0);
+      const totalAccumulated = allOrders.filter(o => o.points > 0).reduce((acc, o) => acc + o.points, 0);
+      const totalReturned = allOrders.filter(o => o.points < 0).reduce((acc, o) => acc + Math.abs(o.points), 0);
       const totalUsed = allRedemptions.reduce((acc, r) => acc + r.points_spent, 0);
       
-      // Expired: orders > 30 days that still have points_remaining
+      // Expired: positive orders > 30 days that still have points_remaining
       const expired = allOrders
-        .filter(o => new Date(o.order_date) < thirtyDaysAgo)
+        .filter(o => o.points > 0 && new Date(o.order_date) < thirtyDaysAgo)
         .reduce((acc, o) => acc + o.points_remaining, 0);
       
-      const available = allOrders
-        .filter(o => new Date(o.order_date) >= thirtyDaysAgo)
-        .reduce((acc, o) => acc + o.points_remaining, 0);
+      const available = Math.max(0, totalAccumulated - totalUsed - totalReturned - expired);
 
-      setMetrics({ total: totalAccumulated, used: totalUsed, expired, available });
+      setMetrics({ total: totalAccumulated, used: totalUsed, returned: totalReturned, expired, available });
       setHistory({ orders: allOrders, redemptions: allRedemptions });
       setLoading(false);
     };
     fetchHistory();
   }, [customer]);
 
-  return (
+  return createPortal(
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-background/60"
-      style={{ backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}
+      style={{ backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)' }}
     >
       <motion.div 
         initial={{ scale: 0.95, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 30 }}
@@ -81,12 +82,13 @@ const HistoryModal = ({ customer, onClose }) => {
             {[
               { label: 'ACUMULADO', value: metrics.total },
               { label: 'USADO', value: metrics.used },
+              { label: 'DEVOLVIDO', value: metrics.returned, isReturn: true },
               { label: 'EXPIRADO', value: metrics.expired },
               { label: 'SALDO', value: metrics.available, highlight: true },
             ].map((m, i) => (
-              <div key={i} className={`p-4 flex flex-col items-center justify-center ${i < 3 ? 'border-r border-white/5' : ''} ${m.highlight ? 'bg-primary/5' : ''}`}>
+              <div key={i} className={`p-4 flex flex-col items-center justify-center ${i < 4 ? 'border-r border-white/5' : ''} ${m.highlight ? 'bg-primary/5' : ''}`}>
                 <p className="text-[7px] font-black text-white/30 tracking-widest mb-1.5 text-center">{m.label}</p>
-                <p className={`text-base font-black text-center ${m.highlight ? 'text-primary' : 'text-white'}`}>{m.value.toLocaleString()}</p>
+                <p className={`text-base font-black text-center ${m.highlight ? 'text-primary' : m.isReturn ? 'text-error' : 'text-white'}`}>{m.value.toLocaleString()}</p>
               </div>
             ))}
           </div>
@@ -97,8 +99,8 @@ const HistoryModal = ({ customer, onClose }) => {
             </div>
             
             <div style={{ border: '1px solid rgba(255, 255, 255, 0.05)', overflowX: 'auto' }}>
-              <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
-                <thead style={{ background: 'rgba(255, 255, 255, 0.02)', color: 'rgba(255, 255, 255, 0.4)', fontSize: '10px', textTransform: 'uppercase', fontWeight: 900 }}>
+              <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+                <thead style={{ background: 'rgba(255, 255, 255, 0.02)', color: 'rgba(255, 255, 255, 0.4)', fontSize: '11px', textTransform: 'uppercase', fontWeight: 900 }}>
                   <tr>
                     <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderR: '1px solid rgba(255,255,255,0.05)' }}>Evento de Ponto</th>
                     <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderR: '1px solid rgba(255,255,255,0.05)' }}>Data</th>
@@ -109,14 +111,21 @@ const HistoryModal = ({ customer, onClose }) => {
                 <tbody className="divide-y divide-white/[0.05]">
                     {/* Orders */}
                     {history.orders.map((o, i) => {
-                      const isExpired = new Date(o.order_date) < (new Date().setDate(new Date().getDate() - 30));
+                      const thirtyDaysAgo = new Date();
+                      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                      const isExpired = o.points > 0 && new Date(o.order_date) < thirtyDaysAgo;
+                      const isReturn = o.points < 0;
                       return (
                         <tr key={`o-${i}`} className="hover:bg-white/[0.04] transition-colors">
-                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' }}>Pedido #{o.order_number}</td>
+                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : 'rgba(255,255,255,0.6)', fontWeight: 'bold' }}>
+                            {isReturn ? `Devolução #${o.order_number}` : `Pedido #${o.order_number}`}
+                          </td>
                           <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>{new Date(o.order_date).toLocaleDateString()}</td>
-                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'var(--success)', fontWeight: 900 }}>+{o.points}</td>
-                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '8px', color: o.points_remaining > 0 ? (isExpired ? 'var(--error)' : 'var(--primary)') : 'rgba(255,255,255,0.1)' }}>
-                            {o.points_remaining > 0 ? (isExpired ? 'EXP.' : `${o.points_remaining} DISP.`) : 'USADO'}
+                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : 'var(--success)', fontWeight: 900 }}>
+                            {o.points > 0 ? `+${o.points}` : o.points}
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', color: isReturn ? 'var(--error)' : (o.points_remaining > 0 ? (isExpired ? 'var(--error)' : 'var(--primary)') : 'rgba(255,255,255,0.1)') }}>
+                            {isReturn ? 'DEBITADO' : (o.points_remaining > 0 ? (isExpired ? 'EXP.' : `${o.points_remaining} DISP.`) : 'USADO')}
                           </td>
                         </tr>
                       );
@@ -127,7 +136,7 @@ const HistoryModal = ({ customer, onClose }) => {
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>Resgate: {r.products?.name || 'Prêmio'}</td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>{new Date(r.created_at).toLocaleDateString()}</td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>-{r.points_spent}</td>
-                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '8px', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
+                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
                       </tr>
                     ))}
                   </tbody>
@@ -137,12 +146,13 @@ const HistoryModal = ({ customer, onClose }) => {
         </div>
       </motion.div>
       <style dangerouslySetInnerHTML={{ __html: `
-        .history-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .history-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
         @media (max-width: 640px) {
           .history-metrics-grid { grid-template-columns: repeat(2, 1fr); }
         }
       `}} />
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 };
 
@@ -167,8 +177,7 @@ const CustomersPage = () => {
       const { data: orders } = await supabase
         .from('orders')
         .select('customer_name, points_remaining')
-        .gte('order_date', isoThreshold)
-        .gt('points_remaining', 0);
+        .gte('order_date', isoThreshold);
       
       const customerMap = {};
       orders?.forEach(order => {
@@ -256,12 +265,22 @@ const CustomersPage = () => {
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px', textAlign: 'right' }}>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); setSelectedCustomer(customer); }}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-primary rounded-lg text-white font-bold text-[10px] uppercase tracking-widest transition-all"
-                    >
-                      Histórico <ArrowRight size={14} />
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); navigate('/loja', { state: { selectedCustomer: customer.name } }); }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-transparent border border-primary/50 hover:bg-primary hover:text-white rounded-full text-primary font-black text-[10px] uppercase tracking-widest transition-all duration-300 hover:shadow-[0_0_20px_var(--primary-glow)] group/btn"
+                      >
+                        <ShoppingBag size={14} className="group-hover/btn:scale-110 transition-transform" /> 
+                        <span>Resgatar</span>
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setSelectedCustomer(customer); }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/10 hover:border-white/30 hover:bg-white/5 rounded-full text-white/40 hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300"
+                      >
+                        <Clock size={14} />
+                        <span>Histórico</span>
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))}
