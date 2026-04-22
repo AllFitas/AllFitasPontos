@@ -117,12 +117,14 @@ const HistoryPage = () => {
                   >
                     {/* DATA */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
-                      <span className="text-[10px] font-black text-white/80 leading-none block">
-                        {new Date(r.created_at).toLocaleDateString('pt-BR')}
-                      </span>
-                      <span className="text-[8px] font-bold text-white/20 mt-1 block">
-                        {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <div className="inline-block text-center">
+                        <span className="text-[9px] font-black text-white/80 leading-tight block">
+                          {new Date(r.created_at).toLocaleDateString('pt-BR')}
+                        </span>
+                        <span className="text-[7px] font-black text-white/20 mt-1 block uppercase tracking-widest">
+                          {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </td>
 
                     {/* MATERIAL */}

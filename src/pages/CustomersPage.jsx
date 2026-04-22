@@ -138,7 +138,14 @@ const HistoryModal = ({ customer, onClose }) => {
                     {history.redemptions.map((r, i) => (
                       <tr key={`r-${i}`} className="bg-indigo-500/[0.05] hover:bg-indigo-500/[0.1] transition-colors">
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>Resgate: {r.products?.name || 'Prêmio'}</td>
-                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>{new Date(r.created_at).toLocaleDateString()}</td>
+                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>
+                          <div className="text-[9px] font-black leading-none mb-1">
+                            {new Date(r.created_at).toLocaleDateString()}
+                          </div>
+                          <div className="text-[7px] font-black opacity-30 tracking-widest uppercase">
+                            {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>-{r.points_spent}</td>
                         <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
                         <td style={{ padding: '12px', textAlign: 'center', fontSize: '10px', color: 'rgba(129,140,248,0.4)', fontWeight: 'bold' }}>
