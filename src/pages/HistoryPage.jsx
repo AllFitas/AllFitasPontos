@@ -89,17 +89,17 @@ const HistoryPage = () => {
           <table className="w-full" style={{ borderCollapse: 'collapse' }}>
             <thead>
               <tr className="bg-white/[0.05]">
-                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Data</th>
-                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Material / Produto</th>
-                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Cliente</th>
-                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Quantidade</th>
-                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Responsável</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em]">Data</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em]">Material / Produto</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em]">Cliente</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em]">Quantidade</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em]">Responsável</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="4" style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-32 text-center text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
+                  <td colSpan="5" style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-32 text-center text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
                     <div className="flex flex-col items-center gap-4">
                       <Loader2 size={24} className="text-primary animate-spin" />
                       <span>Processando Histórico...</span>
@@ -116,52 +116,44 @@ const HistoryPage = () => {
                     className="hover:bg-white/[0.03] transition-colors group"
                   >
                     {/* DATA */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-[10px] font-black text-white/80 leading-none">
-                          {new Date(r.created_at).toLocaleDateString('pt-BR')}
-                        </span>
-                        <span className="text-[8px] font-bold text-white/20 mt-1">
-                          {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
+                      <span className="text-[10px] font-black text-white/80 leading-none block">
+                        {new Date(r.created_at).toLocaleDateString('pt-BR')}
+                      </span>
+                      <span className="text-[8px] font-bold text-white/20 mt-1 block">
+                        {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </td>
 
                     {/* MATERIAL */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center text-center w-full">
-                        <span className="text-[10px] font-black text-white uppercase tracking-tighter text-center block w-full">
-                          {r.products?.name || 'MATERIAL EXCLUÍDO'}
-                        </span>
-                      </div>
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
+                      <span className="text-[10px] font-black text-white uppercase tracking-tighter block w-full">
+                        {r.products?.name || 'MATERIAL EXCLUÍDO'}
+                      </span>
                     </td>
 
                     {/* CLIENTE */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-6 text-center">
-                      <div className="flex items-center justify-center text-center">
-                        <span className="text-[10px] font-bold text-white/40 uppercase max-w-[250px] leading-relaxed text-center block w-full">
-                          {r.customer_name}
-                        </span>
-                      </div>
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-6">
+                      <span className="text-[10px] font-bold text-white/40 uppercase leading-relaxed block w-full">
+                        {r.customer_name}
+                      </span>
                     </td>
 
                     {/* QUANTIDADE */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex flex-col items-center justify-center text-center w-full">
-                        <span className="text-[14px] font-black text-white leading-none text-center">
-                          {r.quantity || 1} <span className="text-[8px] text-white/30 tracking-widest font-bold">UN</span>
-                        </span>
-                        <span className="text-[8px] font-black text-primary/40 mt-1 uppercase tracking-tighter text-center">
-                          -{r.points_spent.toLocaleString()} PTS
-                        </span>
-                      </div>
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
+                      <span className="text-[14px] font-black text-white leading-none block">
+                        {r.quantity || 1} <span className="text-[8px] text-white/30 tracking-widest font-bold">UN</span>
+                      </span>
+                      <span className="text-[8px] font-black text-primary/40 mt-1 uppercase tracking-tighter block">
+                        -{r.points_spent.toLocaleString()} PTS
+                      </span>
                     </td>
 
                     {/* RESPONSÁVEL */}
-                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-2 text-center w-full">
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
+                      <div className="flex items-center justify-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
-                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest text-center">
+                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
                           {r.processed_by || 'SISTEMA'}
                         </span>
                       </div>
@@ -170,7 +162,7 @@ const HistoryPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="py-32 text-center">
+                  <td colSpan="5" className="py-32 text-center">
                     <div className="flex flex-col items-center gap-4 opacity-20">
                       <History size={48} />
                       <span className="text-[10px] font-black uppercase tracking-[0.4em]">Nenhum Registro Encontrado</span>

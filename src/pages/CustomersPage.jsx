@@ -119,19 +119,17 @@ const HistoryModal = ({ customer, onClose }) => {
                       return (
                         <tr key={`o-${i}`} className="hover:bg-white/[0.04] transition-colors">
                           <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : 'rgba(255,255,255,0.6)', fontWeight: 'bold' }}>
-                            <span className="block text-center">{isReturn ? `Devolução #${o.order_number}` : `Pedido #${o.order_number}`}</span>
+                            {isReturn ? `Devolução #${o.order_number}` : `Pedido #${o.order_number}`}
                           </td>
-                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>
-                            <span className="block text-center">{new Date(o.order_date).toLocaleDateString()}</span>
-                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>{new Date(o.order_date).toLocaleDateString()}</td>
                           <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : 'var(--success)', fontWeight: 900 }}>
-                            <span className="block text-center">{o.points > 0 ? `+${o.points}` : o.points}</span>
+                            {o.points > 0 ? `+${o.points}` : o.points}
                           </td>
                           <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : (o.points_remaining > 0 ? (isExpired ? 'var(--error)' : 'var(--primary)') : 'rgba(255,255,255,0.1)') }}>
-                            <span className="block text-center">{isReturn ? 'DEBITADO' : (o.points_remaining > 0 ? (isExpired ? 'EXP.' : `${o.points_remaining} DISP.`) : 'USADO')}</span>
+                            {isReturn ? 'DEBITADO' : (o.points_remaining > 0 ? (isExpired ? 'EXP.' : `${o.points_remaining} DISP.`) : 'USADO')}
                           </td>
                           <td style={{ padding: '12px', textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.2)', fontWeight: 'bold' }}>
-                            <span className="block text-center">{o.processed_by || 'SISTEMA'}</span>
+                            {o.processed_by || 'SISTEMA'}
                           </td>
                         </tr>
                       );
@@ -139,20 +137,12 @@ const HistoryModal = ({ customer, onClose }) => {
                     {/* Redemptions */}
                     {history.redemptions.map((r, i) => (
                       <tr key={`r-${i}`} className="bg-indigo-500/[0.05] hover:bg-indigo-500/[0.1] transition-colors">
-                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>
-                          <span className="block text-center text-[10px]">Resgate: {r.products?.name || 'Prêmio'}</span>
-                        </td>
-                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>
-                          <span className="block text-center">{new Date(r.created_at).toLocaleDateString()}</span>
-                        </td>
-                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>
-                          <span className="block text-center">-{r.points_spent}</span>
-                        </td>
-                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(129,140,248,0.2)' }}>
-                          <span className="block text-center">RESGATADO</span>
-                        </td>
+                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>Resgate: {r.products?.name || 'Prêmio'}</td>
+                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>{new Date(r.created_at).toLocaleDateString()}</td>
+                        <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>-{r.points_spent}</td>
+                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
                         <td style={{ padding: '12px', textAlign: 'center', fontSize: '10px', color: 'rgba(129,140,248,0.4)', fontWeight: 'bold' }}>
-                          <span className="block text-center">{r.processed_by || 'SISTEMA'}</span>
+                          {r.processed_by || 'SISTEMA'}
                         </td>
                       </tr>
                     ))}
