@@ -129,8 +129,8 @@ const HistoryPage = () => {
 
                     {/* MATERIAL */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center">
-                        <span className="text-[10px] font-black text-white uppercase tracking-tighter">
+                      <div className="flex items-center justify-center text-center">
+                        <span className="text-[10px] font-black text-white uppercase tracking-tighter text-center">
                           {r.products?.name || 'MATERIAL EXCLUÍDO'}
                         </span>
                       </div>
@@ -139,7 +139,7 @@ const HistoryPage = () => {
                     {/* CLIENTE */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-6 text-center">
                       <div className="flex items-center justify-center text-center">
-                        <span className="text-[10px] font-bold text-white/40 uppercase max-w-[200px] leading-relaxed">
+                        <span className="text-[10px] font-bold text-white/40 uppercase max-w-[250px] leading-relaxed text-center block w-full">
                           {r.customer_name}
                         </span>
                       </div>
@@ -147,11 +147,11 @@ const HistoryPage = () => {
 
                     {/* QUANTIDADE */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex flex-col items-center justify-center text-center">
-                        <span className="text-[14px] font-black text-white leading-none">
+                      <div className="flex flex-col items-center justify-center text-center w-full">
+                        <span className="text-[14px] font-black text-white leading-none text-center">
                           {r.quantity || 1} <span className="text-[8px] text-white/30 tracking-widest font-bold">UN</span>
                         </span>
-                        <span className="text-[8px] font-black text-primary/40 mt-1 uppercase tracking-tighter">
+                        <span className="text-[8px] font-black text-primary/40 mt-1 uppercase tracking-tighter text-center">
                           -{r.points_spent.toLocaleString()} PTS
                         </span>
                       </div>
@@ -159,9 +159,9 @@ const HistoryPage = () => {
 
                     {/* RESPONSÁVEL */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-2 text-center">
+                      <div className="flex items-center justify-center gap-2 text-center w-full">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
-                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest text-center">
                           {r.processed_by || 'SISTEMA'}
                         </span>
                       </div>
