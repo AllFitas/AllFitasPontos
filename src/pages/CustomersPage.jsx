@@ -139,11 +139,13 @@ const HistoryModal = ({ customer, onClose }) => {
                       <tr key={`r-${i}`} className="bg-indigo-500/[0.05] hover:bg-indigo-500/[0.1] transition-colors">
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>Resgate: {r.products?.name || 'Prêmio'}</td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>
-                          <div className="text-[9px] font-black leading-none mb-1">
-                            {new Date(r.created_at).toLocaleDateString()}
-                          </div>
-                          <div className="text-[7px] font-black opacity-30 tracking-widest uppercase">
-                            {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          <div className="flex flex-col items-center justify-center gap-1">
+                            <span className="text-[9px] font-black leading-none">
+                              {new Date(r.created_at).toLocaleDateString()}
+                            </span>
+                            <span className="text-[7px] font-black opacity-30 tracking-[0.2em] uppercase">
+                              {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           </div>
                         </td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>-{r.points_spent}</td>

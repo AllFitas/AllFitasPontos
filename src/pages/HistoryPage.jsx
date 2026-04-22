@@ -117,11 +117,11 @@ const HistoryPage = () => {
                   >
                     {/* DATA */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)', textAlign: 'center' }} className="py-4 px-4">
-                      <div className="inline-block text-center">
-                        <span className="text-[9px] font-black text-white/80 leading-tight block">
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        <span className="text-[9px] font-black text-white/80 leading-none">
                           {new Date(r.created_at).toLocaleDateString('pt-BR')}
                         </span>
-                        <span className="text-[7px] font-black text-white/20 mt-1 block uppercase tracking-widest">
+                        <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.2em]">
                           {new Date(r.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
