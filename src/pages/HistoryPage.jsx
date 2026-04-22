@@ -129,8 +129,8 @@ const HistoryPage = () => {
 
                     {/* MATERIAL */}
                     <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center text-center">
-                        <span className="text-[10px] font-black text-white uppercase tracking-tighter text-center">
+                      <div className="flex items-center justify-center text-center w-full">
+                        <span className="text-[10px] font-black text-white uppercase tracking-tighter text-center block w-full">
                           {r.products?.name || 'MATERIAL EXCLUÍDO'}
                         </span>
                       </div>
