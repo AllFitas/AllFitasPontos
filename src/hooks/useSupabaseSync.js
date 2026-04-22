@@ -10,6 +10,11 @@ export const useSupabaseSync = () => {
     setError(null);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userName = user?.email 
+        ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) 
+        : 'Sistema';
+
       // 1. Coletar todos os pedidos processados em uma lista única
       const allOrders = customers.flatMap(customer => 
         customer.orders.map(order => {
@@ -22,7 +27,8 @@ export const useSupabaseSync = () => {
             customer_name: customer.name,
             order_date: isoDate,
             points: order.points,
-            points_remaining: order.points // Começa cheio
+            points_remaining: order.points, // Começa cheio
+            processed_by: userName
           };
         })
       );
@@ -71,12 +77,18 @@ export const useSupabaseSync = () => {
     setLoading(true);
     setError(null);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userName = user?.email 
+        ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) 
+        : 'Sistema';
+
       // Chama a função inteligente do banco de dados (RPC)
       const { error: rpcError } = await supabase.rpc('redeem_points_fifo', {
         p_customer_name: customerName,
         p_product_id: productId,
         p_points_to_redeem: pointsToRedeem,
-        p_quantity: quantity
+        p_quantity: quantity,
+        p_user_name: userName
       });
 
       if (rpcError) throw rpcError;

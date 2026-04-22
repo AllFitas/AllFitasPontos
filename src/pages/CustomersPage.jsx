@@ -102,10 +102,11 @@ const HistoryModal = ({ customer, onClose }) => {
               <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
                 <thead style={{ background: 'rgba(255, 255, 255, 0.02)', color: 'rgba(255, 255, 255, 0.4)', fontSize: '11px', textTransform: 'uppercase', fontWeight: 900 }}>
                   <tr>
-                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderR: '1px solid rgba(255,255,255,0.05)' }}>Evento de Ponto</th>
-                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderR: '1px solid rgba(255,255,255,0.05)' }}>Data</th>
-                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderR: '1px solid rgba(255,255,255,0.05)' }}>Valor</th>
-                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Status</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)' }}>Evento</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)' }}>Data</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)' }}>Valor</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)' }}>Status</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Resp.</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.05]">
@@ -124,8 +125,11 @@ const HistoryModal = ({ customer, onClose }) => {
                           <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : 'var(--success)', fontWeight: 900 }}>
                             {o.points > 0 ? `+${o.points}` : o.points}
                           </td>
-                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', color: isReturn ? 'var(--error)' : (o.points_remaining > 0 ? (isExpired ? 'var(--error)' : 'var(--primary)') : 'rgba(255,255,255,0.1)') }}>
+                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: isReturn ? 'var(--error)' : (o.points_remaining > 0 ? (isExpired ? 'var(--error)' : 'var(--primary)') : 'rgba(255,255,255,0.1)') }}>
                             {isReturn ? 'DEBITADO' : (o.points_remaining > 0 ? (isExpired ? 'EXP.' : `${o.points_remaining} DISP.`) : 'USADO')}
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.2)', fontWeight: 'bold' }}>
+                            {o.processed_by || 'SISTEMA'}
                           </td>
                         </tr>
                       );
@@ -136,7 +140,10 @@ const HistoryModal = ({ customer, onClose }) => {
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#a5b4fc', fontWeight: 'bold' }}>Resgate: {r.products?.name || 'Prêmio'}</td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(165,180,252,0.3)' }}>{new Date(r.created_at).toLocaleDateString()}</td>
                         <td style={{ padding: '12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.05)', color: '#818cf8', fontWeight: 900 }}>-{r.points_spent}</td>
-                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
+                        <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '12px', borderRight: '1px solid rgba(255,255,255,0.05)', color: 'rgba(129,140,248,0.2)' }}>RESGATADO</td>
+                        <td style={{ padding: '12px', textAlign: 'center', fontSize: '10px', color: 'rgba(129,140,248,0.4)', fontWeight: 'bold' }}>
+                          {r.processed_by || 'SISTEMA'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

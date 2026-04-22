@@ -22,11 +22,11 @@ const HistoryPage = () => {
 
       if (error) throw error;
 
-      // Grouping logic (same customer, same product, same minute)
+      // Grouping logic (same customer, same product, same minute, same user)
       const grouped = (data || []).reduce((acc, current) => {
         const date = new Date(current.created_at);
         const minuteKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
-        const key = `${minuteKey}_${current.customer_name}_${current.product_id}`;
+        const key = `${minuteKey}_${current.customer_name}_${current.product_id}_${current.processed_by}`;
         
         if (!acc[key]) {
           acc[key] = { ...current };
@@ -93,6 +93,7 @@ const HistoryPage = () => {
                 <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Material / Produto</th>
                 <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Cliente</th>
                 <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Quantidade</th>
+                <th style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center">Responsável</th>
               </tr>
             </thead>
             <tbody>
@@ -152,6 +153,16 @@ const HistoryPage = () => {
                         </span>
                         <span className="text-[8px] font-black text-primary/40 mt-1 uppercase tracking-tighter">
                           -{r.points_spent.toLocaleString()} PTS
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* RESPONSÁVEL */}
+                    <td style={{ border: '1px solid rgba(255,255,255,0.15)' }} className="py-4 px-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+                          {r.processed_by || 'SISTEMA'}
                         </span>
                       </div>
                     </td>
